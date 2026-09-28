@@ -7,7 +7,7 @@
 1|pkg-manager
 2|interviewing
 3|browser-extensions
-4|.github
+4|ai-agents
 5|games
 6|wiki
 7|data-science

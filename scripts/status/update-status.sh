@@ -71,19 +71,27 @@ repo_ci() {
   fi
 }
 
+# repo_tag <repo> — latest published tag, or — when none
+repo_tag() {
+  local out=""
+  out="$(gh api "repos/${OWNER}/$1/tags" --jq '.[0].name' 2>/dev/null)" || true
+  echo "${out:-—}"
+}
+
 build_table() {
-  echo "| # | Repo | Last commit | CI |"
-  echo "|---|---|---|---|"
-  local i repo label date ci
+  echo "| # | Repo | Last commit | Tag | CI |"
+  echo "|---|---|---|---|---|"
+  local i repo label date ci tag
   for i in -1 0 1 2 3 4 5 6 7 8 9; do
     if [[ -z "${SLOTS[$i]:-}" ]]; then
-      echo "| ${i} | — | — | — |"
+      echo "| ${i} | — | — | — | — |"
       continue
     fi
     IFS='|' read -r repo label <<<"${SLOTS[$i]}"
     date="$(repo_date "$repo")"
+    tag="$(repo_tag "$repo")"
     ci="$(repo_ci "$repo")"
-    echo "| ${i} | [${label}](https://github.com/${OWNER}/${repo}) | ${date} | ${ci} |"
+    echo "| ${i} | [${label}](https://github.com/${OWNER}/${repo}) | ${date} | ${tag} | ${ci} |"
   done
 }
 
