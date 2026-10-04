@@ -11,5 +11,5 @@
 5|games
 6|wiki
 7|data-science
-8|assets
+8|ui-assets
 9|ai-training
