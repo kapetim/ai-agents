@@ -1,6 +1,12 @@
 name: issue-pick-task (ai-coder reusable)
 
 on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: Target repository (owner/name)
+        required: true
+        type: string
   workflow_call:
     inputs:
       repo:

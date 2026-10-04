@@ -1,4 +1,4 @@
-name: Repo status
+name: Profile refresh
 description: Refresh the repo-status table in the profile README and open a PR.
 inputs:
   token:
@@ -7,10 +7,10 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Update status table
+    - name: Refresh profile table
       shell: bash
       env:
         STATUS_TOKEN: ${{ inputs.token }}
         STATUS_OWNER: ${{ github.repository_owner }}
         STATUS_TARGET_REPO: kapetim/kapetim
-      run: bash "${{ github.action_path }}/../../../scripts/status/update-status.sh"
+      run: bash "${{ github.action_path }}/../../../scripts/profile/refresh.sh"

@@ -1,6 +1,21 @@
 name: issue-create-epic (ai-coder reusable)
 
 on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: Target repository (owner/name)
+        required: true
+        type: string
+      epic_title:
+        description: Title of the parent issue
+        required: true
+        type: string
+      epic_body:
+        description: Goal / context for the epic
+        required: false
+        default: ''
+        type: string
   workflow_call:
     inputs:
       repo:

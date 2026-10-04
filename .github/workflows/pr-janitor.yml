@@ -1,6 +1,22 @@
 name: pr-janitor (ai-coder reusable)
 
 on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: Target repository (owner/name)
+        required: true
+        type: string
+      pr_number:
+        description: Single PR to inspect; empty = scan all open PRs
+        required: false
+        default: ''
+        type: string
+      max_attempts:
+        description: Attempts past which a PR is considered stuck
+        required: false
+        default: 3
+        type: number
   workflow_call:
     inputs:
       repo:

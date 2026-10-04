@@ -1,6 +1,21 @@
 name: pr-fix (ai-coder reusable)
 
 on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: Target repository (owner/name)
+        required: true
+        type: string
+      pr_number:
+        description: PR with failing checks to fix
+        required: true
+        type: string
+      max_attempts:
+        description: Maximum fix attempts before the janitor takes over
+        required: false
+        default: 3
+        type: number
   workflow_call:
     inputs:
       repo:

@@ -40,18 +40,18 @@ docker/                   Dockerfiles for workflows that need a toolchain
 
 ## Workflows
 
-All reusable (`workflow_call`) or manual (`workflow_dispatch`) — nothing auto-runs.
+All manual (`workflow_dispatch`) or reusable (`workflow_call`) — nothing auto-runs. Every write lands as a **PR, issue, or comment**; no workflow pushes to `main`.
 
 | Workflow | Kind | Purpose |
 | --- | --- | --- |
-| `issue-*.yml` | reusable | issue lifecycle stages (find gaps, create epic, review, pick task) |
-| `pr-*.yml` | reusable | PR lifecycle stages (create, fix, review, janitor) |
+| `profile-refresh.yml` | manual | refresh the profile repo-status table — opens a PR in `kapetim/kapetim` |
+| `issue-*.yml` | reusable + manual | issue lifecycle stages (find gaps, create epic, review, pick task) |
+| `pr-*.yml` | reusable + manual | PR lifecycle stages (create, fix, review, janitor) |
 | `ensure-epics.yml` | reusable + manual | recreate a missing per-folder epic |
 | `sync-labels.yml` | reusable + manual | ensure `epic`/`feature`/`task`/`default` exist |
-| `update-status.yml` | manual | refresh the profile repo-status table |
-| `repo-status-notify.yml` | manual | fire a `repository_dispatch` at the honeypot |
-| `dispatch.yml` | manual | forward a `repository_dispatch` to a target repo |
-| `test.yml` / `release.yml` | auto | this repo's own CI (markdownlint) and tag/release |
+| `release.yml` | manual | bump `VERSION` on a release branch and open a PR |
+| `release-tag.yml` | manual | tag merged `main` and publish a release — no `main` commit |
+| `test.yml` | manual | this repo's own markdownlint |
 
 ## Scaffolding a repo
 
@@ -64,4 +64,4 @@ Writes the default trio + `feature`/`task`, **one epic per `src/*` folder**, a P
 
 ## Repo numbering
 
-The account keeps **one source per domain** and a hard cap of **10 repos** (`0–9`). The order lives in [`scripts/status/repos.txt`](scripts/status/repos.txt); exceeding 10 fails the status workflow. If something doesn't fit, append it to an existing repo instead of adding an 11th.
+The account keeps **one source per domain** and a hard cap of **10 repos** (`0–9`). The order lives in [`scripts/profile/repos.txt`](scripts/profile/repos.txt); exceeding 10 fails the profile-refresh workflow. If something doesn't fit, append it to an existing repo instead of adding an 11th.

@@ -1,31 +1,52 @@
-name: Release
+name: Release (prepare PR)
+
+# Manual only. Bumps VERSION on a release branch and opens a PR — never pushes
+# to main. Merge the PR, then run "Release (tag)" to publish.
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Next version (bare semver, e.g. 1.1.0)
+        required: true
+        type: string
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
-  release:
+  prepare:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: true
 
-      - name: Publish tag
-        id: tag
+      - name: Validate version
         run: |
-          TAG="$(date -u +%Y-%m-%dT%H-%M-%SZ)"
-          git tag "$TAG"
-          git push origin "$TAG"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          v="${{ inputs.version }}"
+          [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::version must be bare semver (x.y.z)"; exit 1; }
 
-      - uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.tag.outputs.tag }}
-          generate_release_notes: true
+      - name: Open release PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          v="${{ inputs.version }}"
+          branch="release/v${v}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          printf '%s\n' "$v" > VERSION
+          git add VERSION
+          git commit -m "chore: release v${v}"
+          git push --force origin "$branch"
+          if gh pr list --base main --head "$branch" --json number --jq '.[0].number' | grep -q .; then
+            echo "release PR already open for v${v}"
+          else
+            gh pr create --base main --head "$branch" \
+              --title "chore: release v${v}" \
+              --body "Bumps \`VERSION\` to \`${v}\`. Merge, then run **Release (tag)** to publish."
+          fi

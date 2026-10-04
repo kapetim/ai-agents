@@ -1,0 +1,43 @@
+name: Release (tag)
+
+# Manual only. Reads VERSION from main and creates the annotated tag + GitHub
+# release. Creates no commit on main. Run after the release PR is merged.
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Re-tag even if the tag already exists
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="$(tr -d '[:space:]' < VERSION)"
+          tag="v${version}"
+          if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
+            if [[ "${{ inputs.force }}" != "true" ]]; then
+              echo "::error::tag ${tag} already exists (set force=true to re-point)"; exit 1
+            fi
+            git push origin ":refs/tags/${tag}"
+          fi
+          git tag -a "$tag" -m "Release ${tag}"
+          git push origin "$tag"
+          gh release create "$tag" --title "$tag" --generate-notes

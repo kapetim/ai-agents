@@ -1,8 +1,9 @@
 name: CI
 
+# Manual only. Read-only markdownlint; nothing auto-runs.
+
 on:
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read

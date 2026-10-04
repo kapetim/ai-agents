@@ -1,6 +1,16 @@
 name: pr-create (ai-coder reusable)
 
 on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: Target repository (owner/name)
+        required: true
+        type: string
+      issue_number:
+        description: Issue this PR implements
+        required: true
+        type: string
   workflow_call:
     inputs:
       repo:

@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # Regenerate the fixed repo-status table in the profile README and open/update a PR.
+# Never pushes to the profile's main — the change always lands as a PR.
 #
-# The order is explicit (scripts/status/repos.txt), not discovered, so slots stay
+# The order is explicit (scripts/profile/repos.txt), not discovered, so slots stay
 # stable and empty slots (0-9) render as `—`. More than 10 repos is an error:
 # append to an existing repo instead of adding an 11th.
 #
 # usage: [STATUS_OWNER=kapetim] [STATUS_TARGET_REPO=kapetim/kapetim] \
-#          [STATUS_TOKEN=...] bash scripts/status/update-status.sh
+#          [STATUS_TOKEN=...] bash scripts/profile/refresh.sh
 set -euo pipefail
 
 OWNER="${STATUS_OWNER:-kapetim}"

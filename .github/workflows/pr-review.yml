@@ -1,6 +1,21 @@
 name: pr-review (ai-coder reusable)
 
 on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: Target repository (owner/name)
+        required: true
+        type: string
+      pr_number:
+        description: PR to review
+        required: true
+        type: string
+      approve:
+        description: Allow approving the PR when confident
+        required: false
+        default: false
+        type: boolean
   workflow_call:
     inputs:
       repo:
