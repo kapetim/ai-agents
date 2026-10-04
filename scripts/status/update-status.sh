@@ -78,20 +78,37 @@ repo_tag() {
   echo "${out:-—}"
 }
 
+# repo_size <repo> — decimal size from the repo's KB size, or — when unavailable
+repo_size() {
+  local kb
+  kb="$(gh api "repos/${OWNER}/$1" --jq '.size' 2>/dev/null)" || true
+  if [[ "$kb" =~ ^[0-9]+$ ]] && (( kb > 0 )); then
+    awk -v kb="$kb" 'BEGIN {
+      b = kb * 1024;
+      if (b >= 1000000000) printf "%.1f GB", b / 1000000000;
+      else if (b >= 1000000) printf "%.1f MB", b / 1000000;
+      else printf "%d KB", b / 1000;
+    }'
+  else
+    echo "—"
+  fi
+}
+
 build_table() {
-  echo "| # | Repo | Last commit | Tag | CI |"
-  echo "|---|---|---|---|---|"
-  local i repo label date ci tag
+  echo "| # | Repo | Last commit | Tag | Size | CI |"
+  echo "|---|---|---|---|---|---|"
+  local i repo label date ci tag size
   for i in -1 0 1 2 3 4 5 6 7 8 9; do
     if [[ -z "${SLOTS[$i]:-}" ]]; then
-      echo "| ${i} | — | — | — | — |"
+      echo "| ${i} | — | — | — | — | — |"
       continue
     fi
     IFS='|' read -r repo label <<<"${SLOTS[$i]}"
     date="$(repo_date "$repo")"
     tag="$(repo_tag "$repo")"
+    size="$(repo_size "$repo")"
     ci="$(repo_ci "$repo")"
-    echo "| ${i} | [${label}](https://github.com/${OWNER}/${repo}) | ${date} | ${tag} | ${ci} |"
+    echo "| ${i} | [${label}](https://github.com/${OWNER}/${repo}) | ${date} | ${tag} | ${size} | ${ci} |"
   done
 }
 
